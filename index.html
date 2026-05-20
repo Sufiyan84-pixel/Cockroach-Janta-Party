@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Cockroach Janta Party | Official Website</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', system-ui, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FF9933 0%, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%, #138808 100%);
+            background-attachment: fixed;
+            background-size: 200% 200%;
+            animation: wave 8s ease infinite;
+        }
+        
+        @keyframes wave {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(15px);
+            border-radius: 2rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #FF9933, #FFFFFF, #138808);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .tagline {
+            text-align: center;
+            font-style: italic;
+            margin-top: 0.5rem;
+            color: #1e1e2a;
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px black;
+            border-left: 5px solid #FF9933;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-box {
+            background: rgba(0,0,0,0.65);
+            padding: 1.2rem;
+            border-radius: 1rem;
+            color: white;
+        }
+        
+        .info-box h3 {
+            color: #FF9933;
+            margin-bottom: 0.5rem;
+        }
+        
+        input {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 1rem;
+            font-size: 1rem;
+        }
+        
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px #FF9933;
+        }
+        
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, #FF9933, #138808);
+            border: none;
+            border-radius: 2rem;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        button:hover {
+            transform: scale(1.02);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .counter {
+            text-align: center;
+            background: rgba(0,0,0,0.65);
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .counter p {
+            color: #ddd;
+            font-size: 0.9rem;
+        }
+        
+        .counter h2 {
+            font-size: 2.5rem;
+            color: #FFD700;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            border-radius: 1rem;
+            font-weight: bold;
+        }
+        
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #cce5ff; color: #004085; }
+        
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid white;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .members-card {
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(15px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .members-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .members-header h2 {
+            color: #FFD700;
+            text-shadow: 2px 2px 4px black;
+            font-size: 1.5rem;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+            max-width: 350px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.9);
+            margin-bottom: 0;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #FF9933;
+        }
+        
+        .refresh-btn, .search-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            width: auto;
+        }
+        
+        .refresh-btn:hover, .search-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .clear-search {
+            background: rgba(220,53,69,0.7);
+        }
+        
+        .members-list {
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        
+        .member-item {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 0.8rem 1.2rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid #FF9933;
+            transition: 0.2s;
+        }
+        
+        .member-item:hover {
+            transform: translateX(5px);
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #FF9933, #138808);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .member-name {
+            flex: 1;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .member-date {
+            font-size: 0.7rem;
+            color: #FFD700;
+        }
+        
+        .empty-members {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+        }
+        
+        .member-count-badge {
+            background: #FF9933;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            color: #1a1a2e;
+            margin-left: 10px;
+        }
+        
+        .db-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #0f0;
+            z-index: 100;
+            font-family: monospace;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.8rem; }
+            .member-avatar { width: 32px; height: 32px; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>COCKROACH JANTA PARTY</h1>
+        <div class="tagline">"Secular, Socialist, Democratic, Lazy" | Reclaiming the insult since 2026</div>
+    </div>
+    
+    <div class="card">
+        <h2 class="section-title">What is Cockroach Janta Party?</h2>
+        <p style="font-size:1.1rem; line-height:1.6;">The Cockroach Janta Party (CJP) is a satirical, meme-driven digital movement born in May 2026. It started as a defiant joke after Chief Justice Surya Kant allegedly compared unemployed youth to "cockroaches". What began as an insult was reclaimed as a badge of honor celebrating resilience, persistence, and the unkillable spirit of India's youth.</p>
+    </div>
+    
+    <div class="grid">
+        <div class="info-box">
+            <h3>Why Cockroach?</h3>
+            <p>Cockroaches are ultimate survivors — 300+ million years, can live without food for a month. Just like India's unemployed youth: underestimated but UNKILLABLE.</p>
+        </div>
+        <div class="info-box">
+            <h3>The Manifesto</h3>
+            <p>No Rajya Sabha seats for retired CJIs<br>50% women's reservation<br>20-year ban on defectors<br>Free Wi-Fi as fundamental right</p>
+        </div>
+        <div class="info-box">
+            <h3>The Movement</h3>
+            <p>80,000+ supporters joined in 3 days! Even TMC MPs showed support. A digital protest, a cockroach revolution.</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2 class="section-title">JOIN THE REVOLUTION</h2>
+        <input type="text" id="userName" placeholder="Your Full Name">
+        <input type="email" id="userEmail" placeholder="Your Email Address">
+        <button id="joinBtn">JOIN COCKROACH JANTA PARTY</button>
+        
+        <div class="counter">
+            <p>Total Cockroach Warriors</p>
+            <h2 id="totalCount">0</h2>
+        </div>
+        <div id="messageDiv" class="message"></div>
+    </div>
+    
+    <div class="members-card">
+        <div class="members-header">
+            <h2>Revolutionary Members <span id="memberCountBadge" class="member-count-badge">0</span></h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search members...">
+                <button id="searchBtn" class="search-btn">Search</button>
+                <button id="clearSearchBtn" class="search-btn clear-search">Clear</button>
+            </div>
+            <button id="refreshMembersBtn" class="refresh-btn">⟳ Refresh</button>
+        </div>
+        <div id="membersListContainer" class="members-list">
+            <div class="empty-members">Loading members...</div>
+        </div>
+    </div>
+    
+    <footer>
+        Jai Cockroach. Jai Hind. | This is a satirical protest movement.
+    </footer>
+</div>
+
+<div id="dbStatus" class="db-status">Connecting...</div>
+
+<script>
+    // Firebase Config - Realtime Database
+    const firebaseConfig = {
+        apiKey: "AIzaSyCaRqj--3nW9ElqO4vnd9FWr2UxQCNmI9g",
+        authDomain: "velvet-f27b0.firebaseapp.com",
+        projectId: "velvet-f27b0",
+        storageBucket: "velvet-f27b0.firebasestorage.app",
+        messagingSenderId: "517563807101",
+        appId: "1:517563807101:android:b4155b72d9d407ae49c814",
+        databaseURL: "https://velvet-f27b0-default-rtdb.firebaseio.com/"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const membersRef = database.ref('members');
+    
+    let allMembers = [];
+    let currentSearchTerm = '';
+    
+    function showMessage(msg, type) {
+        const msgDiv = document.getElementById('messageDiv');
+        msgDiv.innerHTML = msg;
+        msgDiv.className = 'message ' + type;
+        setTimeout(() => {
+            if (msgDiv.innerHTML === msg) msgDiv.innerHTML = '';
+        }, 3000);
+    }
+    
+    function formatDate(timestamp) {
+        if (!timestamp) return 'Just now';
+        try {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMins = Math.floor((now - date) / 60000);
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return diffMins + ' min ago';
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return diffHours + ' hour' + (diffHours > 1 ? 's' : '') + ' ago';
+            const diffDays = Math.floor(diffHours / 24);
+            return diffDays + ' day' + (diffDays > 1 ? 's' : '') + ' ago';
+        } catch(e) {
+            return 'Recently';
+        }
+    }
+    
+    function getInitials(name) {
+        if (!name) return '?';
+        const words = name.trim().split(' ');
+        if (words.length === 1) return words[0].charAt(0).toUpperCase();
+        return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Update ALL counters (ye function fix hai)
+    function updateAllCounters() {
+        const count = allMembers.length;
+        document.getElementById('totalCount').innerText = count;
+        document.getElementById('memberCountBadge').innerText = count;
+        console.log("Counter updated to:", count);
+    }
+    
+    function renderMembersList() {
+        let members = [...allMembers];
+        
+        if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+            const term = currentSearchTerm.toLowerCase().trim();
+            members = members.filter(m => m.name.toLowerCase().includes(term));
+        }
+        
+        const container = document.getElementById('membersListContainer');
+        
+        if (members.length === 0) {
+            if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+                container.innerHTML = '<div class="empty-members">No members found matching your search.</div>';
+            } else {
+                container.innerHTML = '<div class="empty-members">No members yet. Be the first warrior!</div>';
+            }
+            return;
+        }
+        
+        const reversedMembers = [...members].reverse();
+        container.innerHTML = reversedMembers.map(member => `
+            <div class="member-item">
+                <div class="member-avatar">${escapeHtml(getInitials(member.name))}</div>
+                <div class="member-name">${escapeHtml(member.name)}</div>
+                <div class="member-date">${formatDate(member.joinedAt)}</div>
+            </div>
+        `).join('');
+    }
+    
+    // REAL-TIME LISTENER - Ye automatically counter update karega
+    membersRef.on('value', (snapshot) => {
+        allMembers = [];
+        const data = snapshot.val();
+        
+        if (data) {
+            Object.keys(data).forEach(key => {
+                allMembers.push({
+                    id: key,
+                    name: data[key].name,
+                    email: data[key].email,
+                    joinedAt: data[key].joinedAt
+                });
+            });
+        }
+        
+        // IMPORTANT: Dono counters update kar raha hoon
+        updateAllCounters();
+        renderMembersList();
+        
+        document.getElementById('dbStatus').innerHTML = '✓ Realtime DB | ' + allMembers.length + ' members';
+        document.getElementById('dbStatus').style.color = '#0f0';
+        console.log("Real-time update: ", allMembers.length, "members");
+    }, (error) => {
+        console.error("Listener error:", error);
+        document.getElementById('dbStatus').innerHTML = '✗ DB Error: ' + error.message;
+        document.getElementById('dbStatus').style.color = '#f00';
+    });
+    
+    // Join party function
+    async function joinParty() {
+        const name = document.getElementById('userName').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+        
+        if (!name) {
+            showMessage("Please enter your name!", "error");
+            return;
+        }
+        if (!email) {
+            showMessage("Please enter your email!", "error");
+            return;
+        }
+        if (!email.includes('@') || !email.includes('.')) {
+            showMessage("Enter a valid email address!", "error");
+            return;
+        }
+        
+        const joinBtn = document.getElementById('joinBtn');
+        joinBtn.disabled = true;
+        joinBtn.innerHTML = '<span class="spinner"></span> JOINING...';
+        
+        try {
+            // Check if name exists (case-insensitive)
+            const snapshot = await membersRef.once('value');
+            const data = snapshot.val();
+            let nameExists = false;
+            let emailExists = false;
+            
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    if (data[key].name.toLowerCase() === name.toLowerCase()) {
+                        nameExists = true;
+                    }
+                    if (data[key].email.toLowerCase() === email.toLowerCase()) {
+                        emailExists = true;
+                    }
+                });
+            }
+            
+            if (nameExists) {
+                showMessage("This name is already registered! Use a different name.", "error");
+                joinBtn.disabled = false;
+                joinBtn.innerHTML = 'JOIN COCKROACH JANTA PARTY';
+                return;
+            }
+            
+            if (emailExists) {
+                showMessage("This email is already registered!", "error");
+                joinBtn.disabled = false;
+                joinBtn.innerHTML = 'JOIN COCKROACH JANTA PARTY';
+                return;
+            }
+            
+            // Add to Realtime Database
+            const newMemberRef = membersRef.push();
+            await newMemberRef.set({
+                name: name,
+                email: email,
+                joinedAt: new Date().toISOString()
+            });
+            
+            showMessage("Successfully Joined CJP! Welcome to the revolution!", "success");
+            document.getElementById('userName').value = '';
+            document.getElementById('userEmail').value = '';
+            
+        } catch (err) {
+            console.error("Join error:", err);
+            showMessage("Error: " + err.message, "error");
+        } finally {
+            joinBtn.disabled = false;
+            joinBtn.innerHTML = 'JOIN COCKROACH JANTA PARTY';
+        }
+    }
+    
+    function searchMembers() {
+        currentSearchTerm = document.getElementById('searchInput').value;
+        renderMembersList();
+    }
+    
+    function clearSearch() {
+        document.getElementById('searchInput').value = '';
+        currentSearchTerm = '';
+        renderMembersList();
+    }
+    
+    function refreshMembers() {
+        // Manually trigger a refresh
+        membersRef.once('value', (snapshot) => {
+            showMessage("Members list refreshed!", "info");
+        });
+    }
+    
+    // Event listeners
+    document.getElementById('joinBtn').addEventListener('click', joinParty);
+    document.getElementById('refreshMembersBtn').addEventListener('click', refreshMembers);
+    document.getElementById('searchBtn').addEventListener('click', searchMembers);
+    document.getElementById('clearSearchBtn').addEventListener('click', clearSearch);
+    
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') searchMembers();
+    });
+    
+    document.getElementById('userName').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('userEmail').focus();
+    });
+    
+    document.getElementById('userEmail').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') joinParty();
+    });
+    
+    console.log("Website ready! Realtime Database connected.");
+</script>
+</body>
+</html>
